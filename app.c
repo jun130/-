@@ -1,20 +1,6 @@
 /*
  *********************************************************************************************************
- *                                              EXAMPLE CODE
  *
- *                          (c) Copyright 2003-2006; Micrium, Inc.; Weston, FL
- *
- *               All rights reserved.  Protected by international copyright laws.
- *               Knowledge of the source code may NOT be used to develop a similar product.
- *               Please help us continue to provide the Embedded community with the finest
- *               software available.  Your honesty is greatly appreciated.
- *********************************************************************************************************
- */
-
-/*
- *********************************************************************************************************
- *
- *                                            EXAMPLE CODE
  *
  *                                     ST Microelectronics STM32
  *                                              with the
@@ -59,23 +45,23 @@
 
 static OS_STK App_TaskStartStk[APP_TASK_START_STK_SIZE];
 static OS_STK App_TaskUserIFStk[APP_TASK_USER_IF_STK_SIZE];
-static OS_STK App_TaskKbdStk[APP_TASK_KBD_STK_SIZE]; //Áö¿öµµ µÊ ¿ø·¡ ¿¹½Ã¿¡ ÀÖ´ø ÄÚµå//
+static OS_STK App_TaskKbdStk[APP_TASK_KBD_STK_SIZE]; //ì§€ì›Œë„ ë¨ ì›ë˜ ì˜ˆì‹œì— ìˆë˜ ì½”ë“œ//
 
-static OS_STK ADC_TaskStartStk[APP_TASK_START_STK_SIZE]; // ADC °ªÀ» ¹Ş¾Æ¿À´Â ÅÂ½ºÅ©¸¦ À§ÇØ ½ºÅÃÀ» Àâ´Â´Ù.
-static OS_STK LED_TaskStartStk[APP_TASK_START_STK_SIZE]; //LED ÀÛµ¿ÇÏ´Â ÅÂ½ºÅ©¸¦ À§ÇØ ½ºÅÃ ÀâÀ½
-static OS_STK Cooling_TaskStartStk[APP_TASK_START_STK_SIZE]; //  DC Äğ¸µ ÆÒÀ» ±¸µ¿ÇÏ´Â ÅÂ½ºÅ©¸¦ À§ÇØ ½ºÅÃ ÀâÀ½
-static OS_STK Water_TaskStartStk[APP_TASK_START_STK_SIZE]; // ¼­º¸ ¸ğÅÍ¸¦ ±¸µ¿ÇÏ´Â ÅÂ½ºÅ©¸¦ À§ÇØ ½ºÅÃ ÀâÀ½
+static OS_STK ADC_TaskStartStk[APP_TASK_START_STK_SIZE]; // ADC ê°’ì„ ë°›ì•„ì˜¤ëŠ” íƒœìŠ¤í¬ë¥¼ ìœ„í•´ ìŠ¤íƒì„ ì¡ëŠ”ë‹¤.
+static OS_STK LED_TaskStartStk[APP_TASK_START_STK_SIZE]; //LED ì‘ë™í•˜ëŠ” íƒœìŠ¤í¬ë¥¼ ìœ„í•´ ìŠ¤íƒ ì¡ìŒ
+static OS_STK Cooling_TaskStartStk[APP_TASK_START_STK_SIZE]; //  DC ì¿¨ë§ íŒ¬ì„ êµ¬ë™í•˜ëŠ” íƒœìŠ¤í¬ë¥¼ ìœ„í•´ ìŠ¤íƒ ì¡ìŒ
+static OS_STK Water_TaskStartStk[APP_TASK_START_STK_SIZE]; // ì„œë³´ ëª¨í„°ë¥¼ êµ¬ë™í•˜ëŠ” íƒœìŠ¤í¬ë¥¼ ìœ„í•´ ìŠ¤íƒ ì¡ìŒ
 
 typedef unsigned int uint32;
 typedef unsigned short uint16;
 
-static OS_EVENT      *LightMbox; // ºûÀÇ ¾çÀ» °¡Áö´Â ¸ŞÀÏ¹Ú½º
-static OS_EVENT      *TempMbox; // ¿Âµµ °ªÀ» °¡Áö´Â ¸ŞÀÏ¹Ú½º
-static OS_EVENT      *SoilMbox; // Åä¾çÀÇ ¼öºĞÀ» °¡Áö´Â ¸ŞÀÏ¹Ú½º
+static OS_EVENT      *LightMbox; // ë¹›ì˜ ì–‘ì„ ê°€ì§€ëŠ” ë©”ì¼ë°•ìŠ¤
+static OS_EVENT      *TempMbox; // ì˜¨ë„ ê°’ì„ ê°€ì§€ëŠ” ë©”ì¼ë°•ìŠ¤
+static OS_EVENT      *SoilMbox; // í† ì–‘ì˜ ìˆ˜ë¶„ì„ ê°€ì§€ëŠ” ë©”ì¼ë°•ìŠ¤
 
-uint32 ADC_ValueTab[3]; // DMA ¸¦ ÅëÇØ ADCÀÇ ¾Æ³¯·Î±× °ªÀ» ÀúÀåÇÏ´Â ¸Ş¸ğ¸® °ø°£
-uint32 ADC_Value[3]; // ¾Æ³¯·Î±× °ªÀ» ½ÇÁ¦ »ç¿ëÇÏ´Â µ¥ÀÌÅÍ¿¡ ¸Â°Ô º¯È¯µÈ ¸Ş¸ğ¸® °ø°£
-uint16 Pulse[2]= { 2300, 700 }; // ¼­º¸¸ğÅÍÀÇ °¢µµ 90µµ, -90µµ
+uint32 ADC_ValueTab[3]; // DMA ë¥¼ í†µí•´ ADCì˜ ì•„ë‚ ë¡œê·¸ ê°’ì„ ì €ì¥í•˜ëŠ” ë©”ëª¨ë¦¬ ê³µê°„
+uint32 ADC_Value[3]; // ì•„ë‚ ë¡œê·¸ ê°’ì„ ì‹¤ì œ ì‚¬ìš©í•˜ëŠ” ë°ì´í„°ì— ë§ê²Œ ë³€í™˜ëœ ë©”ëª¨ë¦¬ ê³µê°„
+uint16 Pulse[2]= { 2300, 700 }; // ì„œë³´ëª¨í„°ì˜ ê°ë„ 90ë„, -90ë„
 
 #if ((APP_OS_PROBE_EN == DEF_ENABLED) && \
 	(APP_PROBE_COM_EN == DEF_ENABLED) && \
@@ -106,13 +92,13 @@ static CPU_BOOLEAN App_ProbeB1;
  *********************************************************************************************************
  */
 
-static void  App_EventCreate(void); // ¸ŞÀÏ ¹Ú½º ¸¸µå´Â ÇÔ¼ö
-static void  App_TaskStart(void *p_arg); // ÅÂ½ºÅ©¸¦ ½ÃÀÛÇÏ´Â ÇÔ¼ö
+static void  App_EventCreate(void); // ë©”ì¼ ë°•ìŠ¤ ë§Œë“œëŠ” í•¨ìˆ˜
+static void  App_TaskStart(void *p_arg); // íƒœìŠ¤í¬ë¥¼ ì‹œì‘í•˜ëŠ” í•¨ìˆ˜
 
-static void ADC_Task(void* parg); // Àû¿Ü¼± ¼¾¼­ °ª ¹Ş¾Æ¿À´Â ÇÔ¼ö//
-static void LED_Task(void* parg); // Àû¿Ü¼± ¼¾¼­¸¦ ¹Ş¾Æ LED¸¦ ÄÑ´Â ÇÔ¼ö//
-static void Cooling_Task(void* parg); // Àû¿Ü¼± ¼¾¼­ °ªÀ» ¹ÙÅÁÀ¸·Î ¸ğÅÍ¸¦ ±¸µ¿ÇÏ´Â ÇÔ¼ö//
-static void Water_Task(void* parg); // Àû¿Ü¼± ¼¾¼­ °ªÀ» ¹ÙÅÁÀ¸·Î ¸ğÅÍ¸¦ ±¸µ¿ÇÏ´Â ÇÔ¼ö//
+static void ADC_Task(void* parg); // ì ì™¸ì„  ì„¼ì„œ ê°’ ë°›ì•„ì˜¤ëŠ” í•¨ìˆ˜//
+static void LED_Task(void* parg); // ì ì™¸ì„  ì„¼ì„œë¥¼ ë°›ì•„ LEDë¥¼ ì¼œëŠ” í•¨ìˆ˜//
+static void Cooling_Task(void* parg); // ì ì™¸ì„  ì„¼ì„œ ê°’ì„ ë°”íƒ•ìœ¼ë¡œ ëª¨í„°ë¥¼ êµ¬ë™í•˜ëŠ” í•¨ìˆ˜//
+static void Water_Task(void* parg); // ì ì™¸ì„  ì„¼ì„œ ê°’ì„ ë°”íƒ•ìœ¼ë¡œ ëª¨í„°ë¥¼ êµ¬ë™í•˜ëŠ” í•¨ìˆ˜//
 
 static void RCC_Configure(void);
 static void GPIO_Configure(void);
@@ -162,21 +148,21 @@ int  main(void)
 
 
 	/* Initialize "uC/OS-II, The Real-Time Kernel".         */
-	/* IDLE Task¿Í Statistics Task »ı¼º                      */
+	/* IDLE Taskì™€ Statistics Task ìƒì„±                      */
 	OSInit();
 
 	/* Create the start task.                               */
 	/* OSTaskCreatExt()                                     */
-	/* OSTaskCreate()¿Í ´Ù¸£°Ô StackÀ» °Ë»çÇÒ¼ö ÀÖ´Â ±â´ÉÀ» °¡Áü */
-	os_err = OSTaskCreateExt((void (*)(void *))App_TaskStart, // Task°¡ ¼öÇàÇÒ ÇÔ¼ö
-				 (void* )0,                     // Task·Î ³Ñ°ÜÁÙ ÀÎÀÚ
-				 (OS_STK* )&App_TaskStartStk[APP_TASK_START_STK_SIZE - 1],     // Task°¡ ÇÒ´çµÉ StackÀÇ TopÀ» °¡¸®Å°´Â ÁÖ¼Ò
-				 (INT8U           )APP_TASK_START_PRIO,// TaskÀÇ ¿ì¼± ¼øÀ§
-				 (INT16U          )APP_TASK_START_PRIO,// Task¸¦ ÁöÄªÇÏ´Â À¯ÀÏÇÑ ½Äº°ÀÚ, Task °¹¼öÀÇ ±Øº¹À» À§ÇØ¼­ »ç¿ëÇÒ ¿¹Á¤, ÇöÀç´Â ¿ì¼± ¼øÀ§¿Í °°°Ô²û ¼³Á¤
-				 (OS_STK* )&App_TaskStartStk[0],     // Task°¡ ÇÒ´çµÉ StackÀÇ ¸¶Áö¸·À» °¡¸®Å°´Â ÁÖ¼Ò, Stack °Ë»ç¿ëÀ¸·Î »ç¿ë
-				 (INT32U          )APP_TASK_START_STK_SIZE,// Task StackÀÇ Å©±â¸¦ ÀÇ¹Ì
-				 (void* )0,       // Task Control Block È°¿ë½Ã »ç¿ë
-				 (INT16U          )(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK));// Task »ı¼º ¿É¼Ç - ÃÊ±âÈ­ ½Ã StackÀ» 0À¸·Î Ã¤¿ï °ÍÀÎÁö, ºÎµ¿ ¼Ò¼öÁ¡ ¿¬»ê ÀåÄ¡ »ç¿ëÇÒ °ÍÀÎÁö µî ¼³Á¤
+	/* OSTaskCreate()ì™€ ë‹¤ë¥´ê²Œ Stackì„ ê²€ì‚¬í• ìˆ˜ ìˆëŠ” ê¸°ëŠ¥ì„ ê°€ì§ */
+	os_err = OSTaskCreateExt((void (*)(void *))App_TaskStart, // Taskê°€ ìˆ˜í–‰í•  í•¨ìˆ˜
+				 (void* )0,                     // Taskë¡œ ë„˜ê²¨ì¤„ ì¸ì
+				 (OS_STK* )&App_TaskStartStk[APP_TASK_START_STK_SIZE - 1],     // Taskê°€ í• ë‹¹ë  Stackì˜ Topì„ ê°€ë¦¬í‚¤ëŠ” ì£¼ì†Œ
+				 (INT8U           )APP_TASK_START_PRIO,// Taskì˜ ìš°ì„  ìˆœìœ„
+				 (INT16U          )APP_TASK_START_PRIO,// Taskë¥¼ ì§€ì¹­í•˜ëŠ” ìœ ì¼í•œ ì‹ë³„ì, Task ê°¯ìˆ˜ì˜ ê·¹ë³µì„ ìœ„í•´ì„œ ì‚¬ìš©í•  ì˜ˆì •, í˜„ì¬ëŠ” ìš°ì„  ìˆœìœ„ì™€ ê°™ê²Œë” ì„¤ì •
+				 (OS_STK* )&App_TaskStartStk[0],     // Taskê°€ í• ë‹¹ë  Stackì˜ ë§ˆì§€ë§‰ì„ ê°€ë¦¬í‚¤ëŠ” ì£¼ì†Œ, Stack ê²€ì‚¬ìš©ìœ¼ë¡œ ì‚¬ìš©
+				 (INT32U          )APP_TASK_START_STK_SIZE,// Task Stackì˜ í¬ê¸°ë¥¼ ì˜ë¯¸
+				 (void* )0,       // Task Control Block í™œìš©ì‹œ ì‚¬ìš©
+				 (INT16U          )(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK));// Task ìƒì„± ì˜µì…˜ - ì´ˆê¸°í™” ì‹œ Stackì„ 0ìœ¼ë¡œ ì±„ìš¸ ê²ƒì¸ì§€, ë¶€ë™ ì†Œìˆ˜ì  ì—°ì‚° ì¥ì¹˜ ì‚¬ìš©í•  ê²ƒì¸ì§€ ë“± ì„¤ì •
 
 #if (OS_TASK_NAME_SIZE >= 11)
 	OSTaskNameSet(APP_TASK_START_PRIO, (CPU_INT08U*)"Start Task", &os_err);
@@ -212,7 +198,7 @@ static void  App_TaskStart(void *p_arg)
 #endif
 
 	/* Create application events.             */
-	/* Task°£ Åë½ÅÀ» À§ÇÑ MailBox »ı¼º                        */
+	/* Taskê°„ í†µì‹ ì„ ìœ„í•œ MailBox ìƒì„±                        */
 
 	App_EventCreate();
 	RCC_Configure();
@@ -221,52 +207,52 @@ static void  App_TaskStart(void *p_arg)
 	ADC_Configure();
 	TIM_Init();
 
-	os_err = OSTaskCreateExt((void (*)(void *)) ADC_Task, // Task°¡ ¼öÇàÇÒ ÇÔ¼ö
-			(void*) 0,                     // Task·Î ³Ñ°ÜÁÙ ÀÎÀÚ
-			(OS_STK*) &ADC_TaskStartStk[APP_TASK_START_STK_SIZE - 1], // Task°¡ ÇÒ´çµÉ StackÀÇ TopÀ» °¡¸®Å°´Â ÁÖ¼Ò
-			(INT8U) 5,     // TaskÀÇ ¿ì¼± ¼øÀ§
-			(INT16U) 5, // Task¸¦ ÁöÄªÇÏ´Â À¯ÀÏÇÑ ½Äº°ÀÚ, Task °¹¼öÀÇ ±Øº¹À» À§ÇØ¼­ »ç¿ëÇÒ ¿¹Á¤, ÇöÀç´Â ¿ì¼± ¼øÀ§¿Í °°°Ô²û ¼³Á¤
-			(OS_STK*) &ADC_TaskStartStk[0], // Task°¡ ÇÒ´çµÉ StackÀÇ ¸¶Áö¸·À» °¡¸®Å°´Â ÁÖ¼Ò, Stack °Ë»ç¿ëÀ¸·Î »ç¿ë
-			(INT32U) APP_TASK_START_STK_SIZE,     // Task StackÀÇ Å©±â¸¦ ÀÇ¹Ì
-			(void*) 0,       // Task Control Block È°¿ë½Ã »ç¿ë
-			(INT16U)(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK)); // Task »ı¼º ¿É¼Ç - ÃÊ±âÈ­ ½Ã StackÀ» 0À¸·Î Ã¤¿ï °ÍÀÎÁö, ºÎµ¿ ¼Ò¼öÁ¡ ¿¬»ê ÀåÄ¡ »ç¿ëÇÒ °ÍÀÎÁö µî ¼³Á¤
+	os_err = OSTaskCreateExt((void (*)(void *)) ADC_Task, // Taskê°€ ìˆ˜í–‰í•  í•¨ìˆ˜
+			(void*) 0,                     // Taskë¡œ ë„˜ê²¨ì¤„ ì¸ì
+			(OS_STK*) &ADC_TaskStartStk[APP_TASK_START_STK_SIZE - 1], // Taskê°€ í• ë‹¹ë  Stackì˜ Topì„ ê°€ë¦¬í‚¤ëŠ” ì£¼ì†Œ
+			(INT8U) 5,     // Taskì˜ ìš°ì„  ìˆœìœ„
+			(INT16U) 5, // Taskë¥¼ ì§€ì¹­í•˜ëŠ” ìœ ì¼í•œ ì‹ë³„ì, Task ê°¯ìˆ˜ì˜ ê·¹ë³µì„ ìœ„í•´ì„œ ì‚¬ìš©í•  ì˜ˆì •, í˜„ì¬ëŠ” ìš°ì„  ìˆœìœ„ì™€ ê°™ê²Œë” ì„¤ì •
+			(OS_STK*) &ADC_TaskStartStk[0], // Taskê°€ í• ë‹¹ë  Stackì˜ ë§ˆì§€ë§‰ì„ ê°€ë¦¬í‚¤ëŠ” ì£¼ì†Œ, Stack ê²€ì‚¬ìš©ìœ¼ë¡œ ì‚¬ìš©
+			(INT32U) APP_TASK_START_STK_SIZE,     // Task Stackì˜ í¬ê¸°ë¥¼ ì˜ë¯¸
+			(void*) 0,       // Task Control Block í™œìš©ì‹œ ì‚¬ìš©
+			(INT16U)(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK)); // Task ìƒì„± ì˜µì…˜ - ì´ˆê¸°í™” ì‹œ Stackì„ 0ìœ¼ë¡œ ì±„ìš¸ ê²ƒì¸ì§€, ë¶€ë™ ì†Œìˆ˜ì  ì—°ì‚° ì¥ì¹˜ ì‚¬ìš©í•  ê²ƒì¸ì§€ ë“± ì„¤ì •
 
-	os_err = OSTaskCreateExt((void (*)(void *)) LED_Task, // Task°¡ ¼öÇàÇÒ ÇÔ¼ö
-			(void*) 0,                     // Task·Î ³Ñ°ÜÁÙ ÀÎÀÚ
-			(OS_STK*) &LED_TaskStartStk[APP_TASK_START_STK_SIZE - 1], // Task°¡ ÇÒ´çµÉ StackÀÇ TopÀ» °¡¸®Å°´Â ÁÖ¼Ò
-			(INT8U) 6,     // TaskÀÇ ¿ì¼± ¼øÀ§
-			(INT16U) 6, // Task¸¦ ÁöÄªÇÏ´Â À¯ÀÏÇÑ ½Äº°ÀÚ, Task °¹¼öÀÇ ±Øº¹À» À§ÇØ¼­ »ç¿ëÇÒ ¿¹Á¤, ÇöÀç´Â ¿ì¼± ¼øÀ§¿Í °°°Ô²û ¼³Á¤
-			(OS_STK*) &LED_TaskStartStk[0], // Task°¡ ÇÒ´çµÉ StackÀÇ ¸¶Áö¸·À» °¡¸®Å°´Â ÁÖ¼Ò, Stack °Ë»ç¿ëÀ¸·Î »ç¿ë
-			(INT32U) APP_TASK_START_STK_SIZE,     // Task StackÀÇ Å©±â¸¦ ÀÇ¹Ì
-			(void*) 0,       // Task Control Block È°¿ë½Ã »ç¿ë
-			(INT16U)(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK)); // Task »ı¼º ¿É¼Ç - ÃÊ±âÈ­ ½Ã StackÀ» 0À¸·Î Ã¤¿ï °ÍÀÎÁö, ºÎµ¿ ¼Ò¼öÁ¡ ¿¬»ê ÀåÄ¡ »ç¿ëÇÒ °ÍÀÎÁö µî ¼³Á¤
+	os_err = OSTaskCreateExt((void (*)(void *)) LED_Task, // Taskê°€ ìˆ˜í–‰í•  í•¨ìˆ˜
+			(void*) 0,                     // Taskë¡œ ë„˜ê²¨ì¤„ ì¸ì
+			(OS_STK*) &LED_TaskStartStk[APP_TASK_START_STK_SIZE - 1], // Taskê°€ í• ë‹¹ë  Stackì˜ Topì„ ê°€ë¦¬í‚¤ëŠ” ì£¼ì†Œ
+			(INT8U) 6,     // Taskì˜ ìš°ì„  ìˆœìœ„
+			(INT16U) 6, // Taskë¥¼ ì§€ì¹­í•˜ëŠ” ìœ ì¼í•œ ì‹ë³„ì, Task ê°¯ìˆ˜ì˜ ê·¹ë³µì„ ìœ„í•´ì„œ ì‚¬ìš©í•  ì˜ˆì •, í˜„ì¬ëŠ” ìš°ì„  ìˆœìœ„ì™€ ê°™ê²Œë” ì„¤ì •
+			(OS_STK*) &LED_TaskStartStk[0], // Taskê°€ í• ë‹¹ë  Stackì˜ ë§ˆì§€ë§‰ì„ ê°€ë¦¬í‚¤ëŠ” ì£¼ì†Œ, Stack ê²€ì‚¬ìš©ìœ¼ë¡œ ì‚¬ìš©
+			(INT32U) APP_TASK_START_STK_SIZE,     // Task Stackì˜ í¬ê¸°ë¥¼ ì˜ë¯¸
+			(void*) 0,       // Task Control Block í™œìš©ì‹œ ì‚¬ìš©
+			(INT16U)(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK)); // Task ìƒì„± ì˜µì…˜ - ì´ˆê¸°í™” ì‹œ Stackì„ 0ìœ¼ë¡œ ì±„ìš¸ ê²ƒì¸ì§€, ë¶€ë™ ì†Œìˆ˜ì  ì—°ì‚° ì¥ì¹˜ ì‚¬ìš©í•  ê²ƒì¸ì§€ ë“± ì„¤ì •
 
-	os_err = OSTaskCreateExt((void (*)(void *)) Cooling_Task, // Task°¡ ¼öÇàÇÒ ÇÔ¼ö
-			(void*) 0,                     // Task·Î ³Ñ°ÜÁÙ ÀÎÀÚ
-			(OS_STK*) &Cooling_TaskStartStk[APP_TASK_START_STK_SIZE - 1], // Task°¡ ÇÒ´çµÉ StackÀÇ TopÀ» °¡¸®Å°´Â ÁÖ¼Ò
-			(INT8U) 7,     // TaskÀÇ ¿ì¼± ¼øÀ§
-			(INT16U) 7, // Task¸¦ ÁöÄªÇÏ´Â À¯ÀÏÇÑ ½Äº°ÀÚ, Task °¹¼öÀÇ ±Øº¹À» À§ÇØ¼­ »ç¿ëÇÒ ¿¹Á¤, ÇöÀç´Â ¿ì¼± ¼øÀ§¿Í °°°Ô²û ¼³Á¤
-			(OS_STK*) &Cooling_TaskStartStk[0], // Task°¡ ÇÒ´çµÉ StackÀÇ ¸¶Áö¸·À» °¡¸®Å°´Â ÁÖ¼Ò, Stack °Ë»ç¿ëÀ¸·Î »ç¿ë
-			(INT32U) APP_TASK_START_STK_SIZE,     // Task StackÀÇ Å©±â¸¦ ÀÇ¹Ì
-			(void*) 0,       // Task Control Block È°¿ë½Ã »ç¿ë
-			(INT16U)(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK)); // Task »ı¼º ¿É¼Ç - ÃÊ±âÈ­ ½Ã StackÀ» 0À¸·Î Ã¤¿ï °ÍÀÎÁö, ºÎµ¿ ¼Ò¼öÁ¡ ¿¬»ê ÀåÄ¡ »ç¿ëÇÒ °ÍÀÎÁö µî ¼³Á¤
+	os_err = OSTaskCreateExt((void (*)(void *)) Cooling_Task, // Taskê°€ ìˆ˜í–‰í•  í•¨ìˆ˜
+			(void*) 0,                     // Taskë¡œ ë„˜ê²¨ì¤„ ì¸ì
+			(OS_STK*) &Cooling_TaskStartStk[APP_TASK_START_STK_SIZE - 1], // Taskê°€ í• ë‹¹ë  Stackì˜ Topì„ ê°€ë¦¬í‚¤ëŠ” ì£¼ì†Œ
+			(INT8U) 7,     // Taskì˜ ìš°ì„  ìˆœìœ„
+			(INT16U) 7, // Taskë¥¼ ì§€ì¹­í•˜ëŠ” ìœ ì¼í•œ ì‹ë³„ì, Task ê°¯ìˆ˜ì˜ ê·¹ë³µì„ ìœ„í•´ì„œ ì‚¬ìš©í•  ì˜ˆì •, í˜„ì¬ëŠ” ìš°ì„  ìˆœìœ„ì™€ ê°™ê²Œë” ì„¤ì •
+			(OS_STK*) &Cooling_TaskStartStk[0], // Taskê°€ í• ë‹¹ë  Stackì˜ ë§ˆì§€ë§‰ì„ ê°€ë¦¬í‚¤ëŠ” ì£¼ì†Œ, Stack ê²€ì‚¬ìš©ìœ¼ë¡œ ì‚¬ìš©
+			(INT32U) APP_TASK_START_STK_SIZE,     // Task Stackì˜ í¬ê¸°ë¥¼ ì˜ë¯¸
+			(void*) 0,       // Task Control Block í™œìš©ì‹œ ì‚¬ìš©
+			(INT16U)(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK)); // Task ìƒì„± ì˜µì…˜ - ì´ˆê¸°í™” ì‹œ Stackì„ 0ìœ¼ë¡œ ì±„ìš¸ ê²ƒì¸ì§€, ë¶€ë™ ì†Œìˆ˜ì  ì—°ì‚° ì¥ì¹˜ ì‚¬ìš©í•  ê²ƒì¸ì§€ ë“± ì„¤ì •
 
-	os_err = OSTaskCreateExt((void (*)(void *)) Water_Task, // Task°¡ ¼öÇàÇÒ ÇÔ¼ö
-			(void*) 0,                     // Task·Î ³Ñ°ÜÁÙ ÀÎÀÚ
-			(OS_STK*) &Water_TaskStartStk[APP_TASK_START_STK_SIZE - 1], // Task°¡ ÇÒ´çµÉ StackÀÇ TopÀ» °¡¸®Å°´Â ÁÖ¼Ò
-			(INT8U) 8,     // TaskÀÇ ¿ì¼± ¼øÀ§
-			(INT16U) 8, // Task¸¦ ÁöÄªÇÏ´Â À¯ÀÏÇÑ ½Äº°ÀÚ, Task °¹¼öÀÇ ±Øº¹À» À§ÇØ¼­ »ç¿ëÇÒ ¿¹Á¤, ÇöÀç´Â ¿ì¼± ¼øÀ§¿Í °°°Ô²û ¼³Á¤
-			(OS_STK*) &Water_TaskStartStk[0], // Task°¡ ÇÒ´çµÉ StackÀÇ ¸¶Áö¸·À» °¡¸®Å°´Â ÁÖ¼Ò, Stack °Ë»ç¿ëÀ¸·Î »ç¿ë
-			(INT32U) APP_TASK_START_STK_SIZE,     // Task StackÀÇ Å©±â¸¦ ÀÇ¹Ì
-			(void*) 0,       // Task Control Block È°¿ë½Ã »ç¿ë
-			(INT16U)(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK)); // Task »ı¼º ¿É¼Ç - ÃÊ±âÈ­ ½Ã StackÀ» 0À¸·Î Ã¤¿ï °ÍÀÎÁö, ºÎµ¿ ¼Ò¼öÁ¡ ¿¬»ê ÀåÄ¡ »ç¿ëÇÒ °ÍÀÎÁö µî ¼³Á¤
+	os_err = OSTaskCreateExt((void (*)(void *)) Water_Task, // Taskê°€ ìˆ˜í–‰í•  í•¨ìˆ˜
+			(void*) 0,                     // Taskë¡œ ë„˜ê²¨ì¤„ ì¸ì
+			(OS_STK*) &Water_TaskStartStk[APP_TASK_START_STK_SIZE - 1], // Taskê°€ í• ë‹¹ë  Stackì˜ Topì„ ê°€ë¦¬í‚¤ëŠ” ì£¼ì†Œ
+			(INT8U) 8,     // Taskì˜ ìš°ì„  ìˆœìœ„
+			(INT16U) 8, // Taskë¥¼ ì§€ì¹­í•˜ëŠ” ìœ ì¼í•œ ì‹ë³„ì, Task ê°¯ìˆ˜ì˜ ê·¹ë³µì„ ìœ„í•´ì„œ ì‚¬ìš©í•  ì˜ˆì •, í˜„ì¬ëŠ” ìš°ì„  ìˆœìœ„ì™€ ê°™ê²Œë” ì„¤ì •
+			(OS_STK*) &Water_TaskStartStk[0], // Taskê°€ í• ë‹¹ë  Stackì˜ ë§ˆì§€ë§‰ì„ ê°€ë¦¬í‚¤ëŠ” ì£¼ì†Œ, Stack ê²€ì‚¬ìš©ìœ¼ë¡œ ì‚¬ìš©
+			(INT32U) APP_TASK_START_STK_SIZE,     // Task Stackì˜ í¬ê¸°ë¥¼ ì˜ë¯¸
+			(void*) 0,       // Task Control Block í™œìš©ì‹œ ì‚¬ìš©
+			(INT16U)(OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK)); // Task ìƒì„± ì˜µì…˜ - ì´ˆê¸°í™” ì‹œ Stackì„ 0ìœ¼ë¡œ ì±„ìš¸ ê²ƒì¸ì§€, ë¶€ë™ ì†Œìˆ˜ì  ì—°ì‚° ì¥ì¹˜ ì‚¬ìš©í•  ê²ƒì¸ì§€ ë“± ì„¤ì •
 
 	while (DEF_TRUE) {
 		OSTimeDlyHMSM(0, 0, 0, 100);
 	}
 }
 
-static void ADC_Task(void* parg){ /*  ÀÔ·Â¹ŞÀº ADC¸¦ ´Ù¸¥ task¿¡ postÇØÁÖ´Â ÇÔ¼ö */
+static void ADC_Task(void* parg){ /*  ì…ë ¥ë°›ì€ ADCë¥¼ ë‹¤ë¥¸ taskì— postí•´ì£¼ëŠ” í•¨ìˆ˜ */
 
         while(DEF_TRUE){
 
@@ -291,7 +277,7 @@ static void LED_Task(void* parg){
             int ADC_value = (int) OSMboxPend(LightMbox,10,&os_err);
 
 
-            if(ADC_value >30){  /*  ºûÀÌ ¹àÀº °æ¿ì  */
+            if(ADC_value >30){  /*  ë¹›ì´ ë°ì€ ê²½ìš°  */
                  GPIO_ResetBits(GPIOC,GPIO_Pin_8);
             }
             else{
@@ -309,7 +295,7 @@ static void Cooling_Task(void* parg){
            int ADC_value = (int) OSMboxPend(TempMbox,10,&os_err);
 
 
-           if( ADC_value > 60){  /*  ¿Âµµ°¡ ³ôÀº °æ¿ì */
+           if( ADC_value > 60){  /*  ì˜¨ë„ê°€ ë†’ì€ ê²½ìš° */
                 Stop();
                 delay();
           }
@@ -330,7 +316,7 @@ static void Water_Task(void* parg){
             CPU_INT08U os_err;
             int ADC_value = (int) OSMboxPend(SoilMbox,10,&os_err);
 
-            if( ADC_value > 1000){  /* ¼öºĞ ºÎÁ· */
+            if( ADC_value > 1000){  /* ìˆ˜ë¶„ ë¶€ì¡± */
                 openDoor();
                 delay();
           }
@@ -356,7 +342,7 @@ static void RCC_Configure() {
 
 static void GPIO_Configure() {
 
-	/* Á¶µµ¼¾¼­, ¿Âµµ¼¾¼­, Åä¾ç¼öºĞ ¼¾¼­ Pin*/
+	/* ì¡°ë„ì„¼ì„œ, ì˜¨ë„ì„¼ì„œ, í† ì–‘ìˆ˜ë¶„ ì„¼ì„œ Pin*/
 
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
@@ -370,7 +356,7 @@ static void GPIO_Configure() {
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
 
-    /* DC Äğ¸µ ÆÒ  */
+    /* DC ì¿¨ë§ íŒ¬  */
 
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
@@ -536,9 +522,9 @@ static void  App_EventCreate(void)
 #endif
 
 	/* Create MBOX for communication between Kbd and UserIF.*/
-	/* Mail Box »ı¼º                                         */
-	/* Æ÷ÀÎÅÍ Å©±âÀÇ º¯¼ö¸¦ Task³ª Interrupt Service Routine   */
-	/* ¿¡¼­ ´Ù¸¥ Task Àü´ŞÇÒ ¶§ »ç¿ëÇÔ                         */
+	/* Mail Box ìƒì„±                                         */
+	/* í¬ì¸í„° í¬ê¸°ì˜ ë³€ìˆ˜ë¥¼ Taskë‚˜ Interrupt Service Routine   */
+	/* ì—ì„œ ë‹¤ë¥¸ Task ì „ë‹¬í•  ë•Œ ì‚¬ìš©í•¨                         */
 	LightMbox = OSMboxCreate((void*) 0);
 	TempMbox = OSMboxCreate((void*) 0);
 	SoilMbox = OSMboxCreate((void*) 0);
